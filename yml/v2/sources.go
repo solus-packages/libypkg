@@ -36,7 +36,8 @@ func NewSource(URI string) (src Source, err error) {
 		// Git sources
 		pieces := strings.Split(URI, ":")
 		if len(pieces) < 3 {
-			return "", fmt.Errorf("no hash in git URI, should resemble 'git|http://path/to/repo:commit hash")
+			err = fmt.Errorf("no hash in git URI, should resemble 'git|http://path/to/repo:commit hash")
+			return
 		}
 		src[URI] = pieces[len(pieces)-1]
 		return
@@ -81,7 +82,6 @@ func UpdateSources(URIs []string) (srcs []Source, err error) {
 		if err != nil {
 			return
 		}
-		src[URI] = h
 		// Add source to all sources
 		srcs = append(srcs, src)
 	}

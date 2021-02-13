@@ -17,6 +17,7 @@
 package v2
 
 import (
+	"errors"
 	"gopkg.in/yaml.v3"
 )
 
@@ -42,4 +43,28 @@ func (l Licenses) MarshalYAML() (out interface{}, err error) {
 		out = []yaml.Node(l)
 	}
 	return
+}
+
+func (l *Licenses) UnmarshalYAML(value *yaml.Node) error {
+	println(value.Kind)
+	println(yaml.SequenceNode)
+	switch value.Kind {
+	case yaml.ScalarNode:
+		*l = append(*l, *value)
+	case yaml.SequenceNode:
+		if len(value.Content) == 0 {
+			return ErrNotLicense
+		}
+		var ls Licenses
+		for _, node := range value.Content {
+			if node.Kind != yaml.ScalarNode {
+				return ErrNotLicense
+			}
+			ls = append(ls, *node)
+		}
+		*l = ls
+	default:
+		return ErrNotLicense
+	}
+	return nil
 }
