@@ -16,18 +16,65 @@
 
 package v2
 
+import (
+	"errors"
+	"gopkg.in/yaml.v3"
+)
+
 // BuildFlags are special options that configure the build process
 type BuildFlags struct {
-	AutoDep    string   `yaml:"autodep,omitempty"`
-	AVX2       string   `yaml:"avx2,omitempty"`
-	Clang      string   `yaml:"clang,omitempty"`
-	CCache     string   `yaml:"ccache,omitempty"`
-	Debug      string   `yaml:"debug,omitempty"`
-	Devel      string   `yaml:"devel,omitempty"`
-	Emul32     string   `yaml:"emul32,omitempty"`
-	Extract    string   `yaml:"extract,omitempty"`
-	LAStrip    string   `yaml:"lastrip,omitempty"`
-	Networking string   `yaml:"networking,omitempty"`
-	Optimize   []string `yaml:"optimize,omitempty"`
-	Strip      string   `yaml:"strip,omitempty"`
+	AutoDep    DefaultTrue  `yaml:"autodep,omitempty"`
+	AVX2       DefaultFalse `yaml:"avx2,omitempty"`
+	Clang      DefaultTrue  `yaml:"clang,omitempty"`
+	CCache     DefaultFalse `yaml:"ccache,omitempty"`
+	Debug      DefaultTrue  `yaml:"debug,omitempty"`
+	Devel      DefaultFalse `yaml:"devel,omitempty"`
+	Emul32     DefaultFalse `yaml:"emul32,omitempty"`
+	Extract    DefaultTrue  `yaml:"extract,omitempty"`
+	LAStrip    DefaultTrue  `yaml:"lastrip,omitempty"`
+	Networking DefaultFalse `yaml:"networking,omitempty"`
+	Optimize   []string     `yaml:"optimize,omitempty"`
+	Strip      DefaultTrue  `yaml:"strip,omitempty"`
+}
+
+var (
+	ErrNotABool = errors.New("Not a valid boolean string")
+)
+
+type DefaultTrue string
+
+func (dt DefaultTrue) MarshalYAML() (out interface{}, err error) {
+	node := yaml.Node{
+		Kind: yaml.ScalarNode,
+	}
+	switch dt {
+	case "no", "NO", "No", "False", "false":
+		node.Value = "no"
+	case "yes", "YES", "Yes", "True", "true":
+		node.Value = ""
+	default:
+		err = ErrNotABool
+		return
+	}
+	out = node
+	return
+}
+
+type DefaultFalse string
+
+func (df DefaultFalse) MarshalYAML() (out interface{}, err error) {
+	node := yaml.Node{
+		Kind: yaml.ScalarNode,
+	}
+	switch df {
+	case "no", "NO", "No", "False", "false":
+		node.Value = ""
+	case "yes", "YES", "Yes", "True", "true":
+		node.Value = "yes"
+	default:
+		err = ErrNotABool
+		return
+	}
+	out = node
+	return
 }

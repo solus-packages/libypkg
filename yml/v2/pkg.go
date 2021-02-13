@@ -29,10 +29,10 @@ type PackageYML struct {
 	Source       []Source    `yaml:"source"`
 	Homepage     string      `yaml:"homepage,omitempty"`
 	License      Licenses    `yaml:"license"`
-	Component    interface{} `yaml:"component"`
-	Summary      interface{} `yaml:"summary"`
-	Description  interface{} `yaml:"description"`
-	Flags        BuildFlags  `yaml:"flags,omitempty,inline"`
+	Component    ArrayMap    `yaml:"component"`
+	Summary      ArrayMap    `yaml:"summary"`
+	Description  ArrayMap    `yaml:"description"`
+	Flags        BuildFlags  `yaml:",omitempty,inline"`
 	Environment  string      `yaml:"environment,omitempty"`
 	Dependencies PackageDeps `yaml:"dependencies,inline,omitempty"`
 	Stages       BuildStages `yaml:",inline"`
