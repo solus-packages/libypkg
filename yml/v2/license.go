@@ -29,15 +29,18 @@ func (l Licenses) MarshalYAML() (out interface{}, err error) {
 	switch len(l) {
 	case 0:
 		err = ErrNotLicense
+		return
 	case 1:
 		if l[0].Kind != yaml.ScalarNode {
 			err = ErrNotLicense
+			return
 		}
 		out = l[0]
 	case 2:
 		for _, node := range l {
 			if node.Kind != yaml.ScalarNode {
 				err = ErrNotLicense
+				return
 			}
 		}
 		out = []yaml.Node(l)
@@ -46,8 +49,6 @@ func (l Licenses) MarshalYAML() (out interface{}, err error) {
 }
 
 func (l *Licenses) UnmarshalYAML(value *yaml.Node) error {
-	println(value.Kind)
-	println(yaml.SequenceNode)
 	switch value.Kind {
 	case yaml.ScalarNode:
 		*l = append(*l, *value)

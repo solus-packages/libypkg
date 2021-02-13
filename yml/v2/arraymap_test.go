@@ -22,11 +22,11 @@ import (
 	"testing"
 )
 
-func TestLicensesMarshalEmpty(t *testing.T) {
-	var ls Licenses
+func TestArrayMapMarshalEmpty(t *testing.T) {
+	var am ArrayMap
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
-	if err := enc.Encode(ls); err != ErrNotLicense {
+	if err := enc.Encode(am); err != ErrInvalidMap {
 		t.Fatalf("Expected ErrNotLicense, found: %s", err)
 	}
 	if result := out.String(); len(result) != 0 {
@@ -34,18 +34,14 @@ func TestLicensesMarshalEmpty(t *testing.T) {
 	}
 }
 
-func TestLicensesMarshalSingle(t *testing.T) {
-	expected := "license: MIT\n"
-	var ls Licenses
-	l := yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Value: "MIT",
-	}
-	ls = append(ls, l)
+func TestArrayMapMarshalSingle(t *testing.T) {
+	expected := "component: system.devel\n"
+	am := make(ArrayMap)
+	am[DefaultPackage] = "system.devel"
 	value := struct {
-		License Licenses `yaml:"license"`
+		Components ArrayMap `yaml:"component"`
 	}{
-		License: ls,
+		Components: am,
 	}
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
@@ -57,26 +53,18 @@ func TestLicensesMarshalSingle(t *testing.T) {
 	}
 }
 
-func TestLicensesMarshalMultiple(t *testing.T) {
-	expected := `license:
-    - MIT
-    - Apache-2.0
+func TestArrayMapMarshalMultiple(t *testing.T) {
+	expected := `component:
+    - system.devel
+    - devel: programming.devel
 `
-	var ls Licenses
-	l := yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Value: "MIT",
-	}
-	ls = append(ls, l)
-	l = yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Value: "Apache-2.0",
-	}
-	ls = append(ls, l)
+	am := make(ArrayMap)
+	am[DefaultPackage] = "system.devel"
+	am["devel"] = "programming.devel"
 	value := struct {
-		License Licenses `yaml:"license"`
+		Components ArrayMap `yaml:"component"`
 	}{
-		License: ls,
+		Components: am,
 	}
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
@@ -88,80 +76,59 @@ func TestLicensesMarshalMultiple(t *testing.T) {
 	}
 }
 
-func TestLicensesUnmarshalEmpty(t *testing.T) {
-	input := "license:"
+func TestArrayMapUnmarshalEmpty(t *testing.T) {
+	input := "component:"
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		License Licenses `yaml:"license"`
+		Components ArrayMap `yaml:"component"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
 	}
-	if l := len(value.License); l != 0 {
+	if l := len(value.Components); l != 0 {
 		t.Fatalf("expected exactly 0 entries, found: %d", l)
 	}
 }
 
-func TestLicensesUnmarshalSingle(t *testing.T) {
-	input := "license: MIT # hello"
+func TestArrayMapUnmarshalSingle(t *testing.T) {
+	input := "component: system.devel"
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		License Licenses `yaml:"license"`
+		Components ArrayMap `yaml:"component"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
 	}
-	if l := len(value.License); l != 1 {
+	if l := len(value.Components); l != 1 {
 		t.Fatalf("expected exactly one entry, found: %d", l)
 	}
-	node := value.License[0]
-	if node.Kind != yaml.ScalarNode {
-		t.Errorf("exected '%d', found: %d", yaml.ScalarNode, node.Kind)
-	}
-	if node.Value != "MIT" {
-		t.Errorf("expected 'MIT', found: %s", node.Value)
-	}
-	if node.LineComment != "# hello" {
-		t.Errorf("expected '# hello', found: %s", node.LineComment)
+	if v := value.Components[DefaultPackage]; v != "system.devel" {
+		t.Errorf("expected 'system.devel', found: %s", v)
 	}
 }
 
-func TestLicensesUnmarshalMultiple(t *testing.T) {
-	input := `license:
-     - MIT # hello
-     - Apache-2.0
+func TestArrayMapUnmarshalMultiple(t *testing.T) {
+	input := `component:
+     - system.devel
+     - devel: programming.devel
 `
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		License Licenses `yaml:"license"`
+		Components ArrayMap `yaml:"component"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
 	}
-	if l := len(value.License); l != 2 {
+	if l := len(value.Components); l != 2 {
 		t.Fatalf("expected exactly two entries, found: %d", l)
 	}
-	node := value.License[0]
-	if node.Kind != yaml.ScalarNode {
-		t.Errorf("exected '%d', found: %d", yaml.ScalarNode, node.Kind)
+	if v := value.Components[DefaultPackage]; v != "system.devel" {
+		t.Errorf("expected 'system.devel', found: %s", v)
 	}
-	if node.Value != "MIT" {
-		t.Errorf("expected 'MIT', found: %s", node.Value)
-	}
-	if node.LineComment != "# hello" {
-		t.Errorf("expected '# hello', found: %s", node.LineComment)
-	}
-	node = value.License[1]
-	if node.Kind != yaml.ScalarNode {
-		t.Errorf("exected '%d', found: %d", yaml.ScalarNode, node.Kind)
-	}
-	if node.Value != "Apache-2.0" {
-		t.Errorf("expected 'Apache-2.0', found: %s", node.Value)
-	}
-	if node.LineComment != "" {
-		t.Errorf("expected '', found: %s", node.LineComment)
+	if v := value.Components["devel"]; v != "programming.devel" {
+		t.Errorf("expected 'programming.devel', found: %s", v)
 	}
 }
