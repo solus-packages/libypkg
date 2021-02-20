@@ -41,40 +41,69 @@ var (
 	ErrNotABool = errors.New("Not a valid boolean string")
 )
 
-type DefaultTrue string
+type DefaultTrue struct {
+	Valid bool
+	Bool  bool
+}
 
 func (dt DefaultTrue) MarshalYAML() (out interface{}, err error) {
 	node := yaml.Node{
 		Kind: yaml.ScalarNode,
 	}
-	switch dt {
-	case "no", "NO", "No", "False", "false":
+	if dt.Valid && !dt.Bool {
 		node.Value = "no"
-	case "yes", "YES", "Yes", "True", "true":
-		node.Value = ""
-	default:
-		err = ErrNotABool
-		return
 	}
 	out = node
 	return
 }
 
-type DefaultFalse string
+func (dt *DefaultTrue) UnmarshalYAML(value *yaml.Node) error {
+	if value.Kind != yaml.ScalarNode {
+		return ErrNotABool
+	}
+	switch value.Value {
+	case "no", "NO", "No", "False", "false":
+		(*dt).Valid = true
+		(*dt).Bool = false
+	case "yes", "YES", "Yes", "True", "true":
+		(*dt).Valid = true
+		(*dt).Bool = true
+	default:
+		return ErrNotABool
+	}
+	return nil
+}
+
+type DefaultFalse struct {
+	Valid bool
+	Bool  bool
+}
 
 func (df DefaultFalse) MarshalYAML() (out interface{}, err error) {
 	node := yaml.Node{
 		Kind: yaml.ScalarNode,
 	}
-	switch df {
-	case "no", "NO", "No", "False", "false":
-		node.Value = ""
-	case "yes", "YES", "Yes", "True", "true":
+	if df.Valid && df.Bool {
 		node.Value = "yes"
-	default:
-		err = ErrNotABool
-		return
 	}
 	out = node
 	return
+}
+
+func (df *DefaultFalse) UnmarshalYAML(value *yaml.Node) error {
+	println("mark")
+	if value.Kind != yaml.ScalarNode {
+		return ErrNotABool
+	}
+	switch value.Value {
+	case "no", "NO", "No", "False", "false":
+		(*df).Valid = true
+		(*df).Bool = false
+	case "yes", "YES", "Yes", "True", "true":
+		(*df).Valid = true
+		(*df).Bool = true
+	default:
+		return ErrNotABool
+	}
+	return nil
 }

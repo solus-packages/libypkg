@@ -50,7 +50,10 @@ autodep: no
 	}{
 		Name: "golang",
 		Flags: BuildFlags{
-			AutoDep: "no",
+			AutoDep: DefaultTrue{
+				Valid: true,
+				Bool:  false,
+			},
 		},
 	}
 	var out strings.Builder
@@ -58,25 +61,31 @@ autodep: no
 	if err := enc.Encode(value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
 	}
-	println(out.String())
 	if result := out.String(); result != expected {
 		t.Fatalf("Expected %s, found: %s", expected, result)
 	}
 }
 
-/*
 func TestBuildFlagsMarshalMultiple(t *testing.T) {
-	expected := `component:
-    - system.devel
-    - devel: programming.devel
+	expected := `name: golang
+autodep: no
+avx2: yes
 `
-	am := make(BuildFlags)
-	am[DefaultPackage] = "system.devel"
-	am["devel"] = "programming.devel"
 	value := struct {
-		Components BuildFlags `yaml:"component"`
+		Name  string     `yaml:"name"`
+		Flags BuildFlags `yaml:",omitempty,inline"`
 	}{
-		Components: am,
+		Name: "golang",
+		Flags: BuildFlags{
+			AutoDep: DefaultTrue{
+				Valid: true,
+				Bool:  false,
+			},
+			AVX2: DefaultFalse{
+				Valid: true,
+				Bool:  true,
+			},
+		},
 	}
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
@@ -89,59 +98,99 @@ func TestBuildFlagsMarshalMultiple(t *testing.T) {
 }
 
 func TestBuildFlagsUnmarshalEmpty(t *testing.T) {
-	input := "component:"
+	input := "name: golang"
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		Components BuildFlags `yaml:"component"`
+		Name  string     `yaml:"name"`
+		Flags BuildFlags `yaml:",omitempty,inline"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
 	}
-	if l := len(value.Components); l != 0 {
-		t.Fatalf("expected exactly 0 entries, found: %d", l)
+	if value.Name != "golang" {
+		t.Fatalf("expected '%s', found: %s", "golang", value.Name)
 	}
 }
 
 func TestBuildFlagsUnmarshalSingle(t *testing.T) {
-	input := "component: system.devel"
-	in := strings.NewReader(input)
-	dec := yaml.NewDecoder(in)
-	var value struct {
-		Components BuildFlags `yaml:"component"`
-	}
-	if err := dec.Decode(&value); err != nil {
-		t.Fatalf("Expected no error, found: %s", err)
-	}
-	if l := len(value.Components); l != 1 {
-		t.Fatalf("expected exactly one entry, found: %d", l)
-	}
-	if v := value.Components[DefaultPackage]; v != "system.devel" {
-		t.Errorf("expected 'system.devel', found: %s", v)
-	}
-}
-
-func TestBuildFlagsUnmarshalMultiple(t *testing.T) {
-	input := `component:
-     - system.devel
-     - devel: programming.devel
+	input := `name: golang
+autodep: no
 `
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		Components BuildFlags `yaml:"component"`
+		Name  string     `yaml:"name"`
+		Flags BuildFlags `yaml:",inline"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
 	}
-	if l := len(value.Components); l != 2 {
-		t.Fatalf("expected exactly two entries, found: %d", l)
+	if value.Name != "golang" {
+		t.Fatalf("expected '%s', found: %s", "golang", value.Name)
 	}
-	if v := value.Components[DefaultPackage]; v != "system.devel" {
-		t.Errorf("expected 'system.devel', found: %s", v)
+	autodep := value.Flags.AutoDep
+	if !autodep.Valid {
+		t.Error("autodep should be valid!")
 	}
-	if v := value.Components["devel"]; v != "programming.devel" {
-		t.Errorf("expected 'programming.devel', found: %s", v)
+	if autodep.Bool {
+		t.Error("autodep should be false!")
 	}
 }
-*/
+
+func TestBuildFlagsUnmarshalMultiple(t *testing.T) {
+	input := `name: golang
+autodep: no
+avx2: yes
+clang: yes
+ccache: no
+`
+	in := strings.NewReader(input)
+	dec := yaml.NewDecoder(in)
+	var value struct {
+		Name  string     `yaml:"name"`
+		Flags BuildFlags `yaml:",inline"`
+	}
+	if err := dec.Decode(&value); err != nil {
+		t.Fatalf("Expected no error, found: %s", err)
+	}
+	if value.Name != "golang" {
+		t.Fatalf("expected '%s', found: %s", "golang", value.Name)
+	}
+	autodep := value.Flags.AutoDep
+	if !autodep.Valid {
+		t.Error("autodep should be valid!")
+	}
+	if autodep.Bool {
+		t.Error("autodep should be false!")
+	}
+	avx2 := value.Flags.AVX2
+	if !avx2.Valid {
+		t.Error("avx2 should be valid!")
+	}
+	if !avx2.Bool {
+		t.Error("avx2 should be true!")
+	}
+	clang := value.Flags.Clang
+	if !clang.Valid {
+		t.Error("clang should be valid!")
+	}
+	if !clang.Bool {
+		t.Error("clang should be true!")
+	}
+	ccache := value.Flags.CCache
+	if !ccache.Valid {
+		t.Error("ccache should be valid!")
+	}
+	if ccache.Bool {
+		t.Error("ccache should be false!")
+	}
+	debug := value.Flags.Debug
+	if debug.Valid {
+		t.Error("debug should not be valid!")
+	}
+	devel := value.Flags.Devel
+	if devel.Valid {
+		t.Error("devel should not be valid!")
+	}
+}
