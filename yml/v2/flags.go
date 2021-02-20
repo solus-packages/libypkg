@@ -38,14 +38,17 @@ type BuildFlags struct {
 }
 
 var (
+    // ErrNotABool indicates a string value that cannot be converted to a bool
 	ErrNotABool = errors.New("Not a valid boolean string")
 )
 
+// DefaultTrue is a boolean which should omitted if true when marshaling
 type DefaultTrue struct {
 	Valid bool
 	Bool  bool
 }
 
+// MarshalYAML writes a DefaultTrue as "no" if false and omits it if empty or invalid
 func (dt DefaultTrue) MarshalYAML() (out interface{}, err error) {
 	node := yaml.Node{
 		Kind: yaml.ScalarNode,
@@ -57,6 +60,7 @@ func (dt DefaultTrue) MarshalYAML() (out interface{}, err error) {
 	return
 }
 
+// UnmarshalYAML converts a string to a DefaultTrue based on its value
 func (dt *DefaultTrue) UnmarshalYAML(value *yaml.Node) error {
 	if value.Kind != yaml.ScalarNode {
 		return ErrNotABool
@@ -74,11 +78,13 @@ func (dt *DefaultTrue) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+// DefaultFalse is a boolean which should omitted if false when marshaling
 type DefaultFalse struct {
 	Valid bool
 	Bool  bool
 }
 
+// MarshalYAML writes a DefaultFalse as "yes" if true and omits it if empty or invalid
 func (df DefaultFalse) MarshalYAML() (out interface{}, err error) {
 	node := yaml.Node{
 		Kind: yaml.ScalarNode,
@@ -90,6 +96,7 @@ func (df DefaultFalse) MarshalYAML() (out interface{}, err error) {
 	return
 }
 
+// UnmarshalYAML converts a string to a DefaultFalse based on its value
 func (df *DefaultFalse) UnmarshalYAML(value *yaml.Node) error {
 	if value.Kind != yaml.ScalarNode {
 		return ErrNotABool

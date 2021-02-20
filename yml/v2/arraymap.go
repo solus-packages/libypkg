@@ -22,26 +22,37 @@ import (
 	"sort"
 )
 
+// ArrayMap is a YAML list or single value that gets read in as a map
+//
+// Examples:
+// component: system.devel
+//
+// component:
+//     - system.devel
+//     - docs: programming.tools
 type ArrayMap map[string]string
 
+// ErrInvalidMap indicates that an ArrayMap is either invalid or being filled by invalid YAML
 var ErrInvalidMap = errors.New("ArrayMap must be a single string or an array of key value pairs")
 
 const (
+    // DefaultPackage specifies a reserved package name for the main package in a map
 	DefaultPackage = "^"
 )
 
-func (m ArrayMap) MarshalYAML() (out interface{}, err error) {
-	switch len(m) {
+// MarshalYAML handles custom marshaling for ArrayMap
+func (am ArrayMap) MarshalYAML() (out interface{}, err error) {
+	switch len(am) {
 	case 0:
 		err = ErrInvalidMap
 	case 1:
-		if len(m[DefaultPackage]) == 0 {
+		if len(am[DefaultPackage]) == 0 {
 			err = ErrInvalidMap
 			return
 		}
-		out = m[DefaultPackage]
+		out = am[DefaultPackage]
 	case 2:
-		main := m[DefaultPackage]
+		main := am[DefaultPackage]
 		if len(main) == 0 {
 			err = ErrInvalidMap
 			return
@@ -53,7 +64,7 @@ func (m ArrayMap) MarshalYAML() (out interface{}, err error) {
 		}
 		nodes = append(nodes, node)
 		var names []string
-		for name := range m {
+		for name := range am {
 			if name != DefaultPackage {
 				names = append(names, name)
 			}
@@ -69,7 +80,7 @@ func (m ArrayMap) MarshalYAML() (out interface{}, err error) {
 			}
 			value := yaml.Node{
 				Kind:  yaml.ScalarNode,
-				Value: m[name],
+				Value: am[name],
 			}
 			node.Content = append(node.Content, &key, &value)
 			nodes = append(nodes, node)
@@ -79,6 +90,7 @@ func (m ArrayMap) MarshalYAML() (out interface{}, err error) {
 	return
 }
 
+// UnmarshalYAML handles custom unmarshaling for ArrayMap
 func (am *ArrayMap) UnmarshalYAML(value *yaml.Node) error {
 	switch value.Kind {
 	case yaml.ScalarNode:

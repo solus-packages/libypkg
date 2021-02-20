@@ -21,10 +21,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Licenses is allowed to contain one or more SPDX license identifiers, but may be a scalar or a list in YAML
 type Licenses []yaml.Node
 
+// ErrNotLicense indicates that a Licenses is being read from invalid YAML or written when empty
 var ErrNotLicense = errors.New("Licenses must be a single string or an array of strings")
 
+// MarshalYAML converts Licenses to a string (singular) or list (plural) when writing YAML
 func (l Licenses) MarshalYAML() (out interface{}, err error) {
 	switch len(l) {
 	case 0:
@@ -48,6 +51,7 @@ func (l Licenses) MarshalYAML() (out interface{}, err error) {
 	return
 }
 
+// UnmarshalYAML converts a string (singular) or list (plural) to Licenses when reading YAML
 func (l *Licenses) UnmarshalYAML(value *yaml.Node) error {
 	switch value.Kind {
 	case yaml.ScalarNode:

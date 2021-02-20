@@ -22,17 +22,28 @@ import (
 	"sort"
 )
 
+// ArrayListMap is a YAML list which gets read into a map
+//
+// Example:
+//
+// - one
+// - two
+// - red:
+//     - three
+//     - four
 type ArrayListMap map[string][]string
 
+// ErrInvalidListMap indicates that the specified YAML is invalid for this type
 var ErrInvalidListMap = errors.New("ArrayListMap must be a list of strings or a map of lists of strings")
 
-func (m ArrayListMap) MarshalYAML() (out interface{}, err error) {
-	if len(m) == 0 {
+// MarshalYAML is a custom marshaler to handle this type
+func (am ArrayListMap) MarshalYAML() (out interface{}, err error) {
+	if len(am) == 0 {
 		err = ErrInvalidListMap
 		return
 	}
 	nodes := make([]yaml.Node, 0)
-	main := m[DefaultPackage]
+	main := am[DefaultPackage]
 	if len(main) > 0 {
 		for _, pkg := range main {
 			node := yaml.Node{
@@ -43,7 +54,7 @@ func (m ArrayListMap) MarshalYAML() (out interface{}, err error) {
 		}
 	}
 	var names []string
-	for name := range m {
+	for name := range am {
 		if name != DefaultPackage {
 			names = append(names, name)
 		}
@@ -60,7 +71,7 @@ func (m ArrayListMap) MarshalYAML() (out interface{}, err error) {
 		value := yaml.Node{
 			Kind: yaml.SequenceNode,
 		}
-		for _, pkg := range m[name] {
+		for _, pkg := range am[name] {
 			child := yaml.Node{
 				Kind:  yaml.ScalarNode,
 				Value: pkg,
@@ -74,6 +85,7 @@ func (m ArrayListMap) MarshalYAML() (out interface{}, err error) {
 	return
 }
 
+// UnmarshalYAML is a custom unmarshaler to handle this type
 func (am *ArrayListMap) UnmarshalYAML(value *yaml.Node) error {
 	if value.Kind != yaml.SequenceNode {
 		return ErrInvalidListMap
