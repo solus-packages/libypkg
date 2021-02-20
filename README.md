@@ -1,4 +1,4 @@
-# libeopkg
+# libypkg
 Go library for manipulating package.yml files
 
 ## License
