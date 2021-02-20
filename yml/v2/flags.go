@@ -91,7 +91,6 @@ func (df DefaultFalse) MarshalYAML() (out interface{}, err error) {
 }
 
 func (df *DefaultFalse) UnmarshalYAML(value *yaml.Node) error {
-	println("mark")
 	if value.Kind != yaml.ScalarNode {
 		return ErrNotABool
 	}

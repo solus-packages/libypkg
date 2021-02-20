@@ -23,20 +23,20 @@ import (
 
 // PackageYML is the v3 representation of the Package YML specification
 type PackageYML struct {
-	Name         string      `yaml:"name"`
-	Version      string      `yaml:"version"`
-	Release      uint        `yaml:"release"`
-	Source       []Source    `yaml:"source"`
-	Homepage     string      `yaml:"homepage,omitempty"`
-	License      Licenses    `yaml:"license"`
-	Component    ArrayMap    `yaml:"component"`
-	Summary      ArrayMap    `yaml:"summary"`
-	Description  ArrayMap    `yaml:"description"`
-	Flags        BuildFlags  `yaml:",omitempty,inline"`
-	Environment  string      `yaml:"environment,omitempty"`
-	Dependencies PackageDeps `yaml:"dependencies,inline,omitempty"`
-	Stages       BuildStages `yaml:",inline"`
-	Patterns     interface{} `yaml:"patterns,omitempty"`
+	Name         string       `yaml:"name"`
+	Version      string       `yaml:"version"`
+	Release      uint         `yaml:"release"`
+	Source       []Source     `yaml:"source"`
+	Homepage     string       `yaml:"homepage,omitempty"`
+	License      Licenses     `yaml:"license"`
+	Component    ArrayMap     `yaml:"component"`
+	Summary      ArrayMap     `yaml:"summary"`
+	Description  ArrayMap     `yaml:"description"`
+	Flags        BuildFlags   `yaml:",omitempty,inline"`
+	Environment  string       `yaml:"environment,omitempty"`
+	Dependencies PackageDeps  `yaml:"dependencies,inline,omitempty"`
+	Stages       BuildStages  `yaml:",inline"`
+	Patterns     ArrayListMap `yaml:"patterns,omitempty"`
 	f            *os.File
 }
 
