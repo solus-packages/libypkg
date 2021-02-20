@@ -36,7 +36,7 @@ type ArrayMap map[string]string
 var ErrInvalidMap = errors.New("ArrayMap must be a single string or an array of key value pairs")
 
 const (
-    // DefaultPackage specifies a reserved package name for the main package in a map
+	// DefaultPackage specifies a reserved package name for the main package in a map
 	DefaultPackage = "^"
 )
 

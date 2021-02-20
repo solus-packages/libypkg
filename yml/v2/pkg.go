@@ -42,7 +42,6 @@ type PackageYML struct {
 
 // Load populates a v2 PackageYML by reading in the contents from a specific filepath
 func (p *PackageYML) Load(path string, mode int) error {
-	// p.Flags = DefaultBuildFlags
 	f, err := os.OpenFile(path, mode, 00644)
 	if err != nil {
 		return err

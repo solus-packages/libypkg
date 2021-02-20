@@ -39,7 +39,7 @@ func NewSource(URI string) (src Source, err error) {
 			err = fmt.Errorf("no hash in git URI, should resemble 'git|http://path/to/repo:commit hash")
 			return
 		}
-		src[URI] = pieces[len(pieces)-1]
+		src[strings.Join(pieces[:len(pieces)-1], ":")] = pieces[len(pieces)-1]
 		return
 	} else if strings.HasPrefix(URI, "file://") {
 		// Local File sources

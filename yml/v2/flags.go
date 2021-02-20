@@ -38,7 +38,7 @@ type BuildFlags struct {
 }
 
 var (
-    // ErrNotABool indicates a string value that cannot be converted to a bool
+	// ErrNotABool indicates a string value that cannot be converted to a bool
 	ErrNotABool = errors.New("Not a valid boolean string")
 )
 
