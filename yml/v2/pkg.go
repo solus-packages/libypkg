@@ -36,6 +36,7 @@ type PackageYML struct {
 	Environment  string       `yaml:"environment,omitempty"`
 	Dependencies PackageDeps  `yaml:"dependencies,inline,omitempty"`
 	Stages       BuildStages  `yaml:",inline"`
+	Permanent    ArrayListMap `yaml:"permanent,omitempty"`
 	Patterns     ArrayListMap `yaml:"patterns,omitempty"`
 	f            *os.File
 }

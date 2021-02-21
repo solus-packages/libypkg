@@ -18,6 +18,8 @@ package v2
 
 // PackageDeps includes the dependencies required for the Build, Check, and Run Stages
 type PackageDeps struct {
-	Build []string       `yaml:"builddeps,omitempty"`
-	Run   []ArrayListMap `yaml:"rundeps,omitempty"`
+	Replaces  ArrayListMap `yaml:"replaces,omitempty"`
+	Conflicts ArrayListMap `yaml:"conflicts,omitempty"`
+	Build     []string     `yaml:"builddeps,omitempty"`
+	Run       ArrayListMap `yaml:"rundeps,omitempty"`
 }

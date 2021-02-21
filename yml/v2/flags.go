@@ -32,6 +32,7 @@ type BuildFlags struct {
 	Emul32     DefaultFalse `yaml:"emul32,omitempty"`
 	Extract    DefaultTrue  `yaml:"extract,omitempty"`
 	LAStrip    DefaultTrue  `yaml:"lastrip,omitempty"`
+	LibSplit   DefaultTrue  `yaml:"libsplit,omitempty"`
 	Networking DefaultFalse `yaml:"networking,omitempty"`
 	Optimize   []string     `yaml:"optimize,omitempty"`
 	Strip      DefaultTrue  `yaml:"strip,omitempty"`
