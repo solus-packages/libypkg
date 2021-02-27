@@ -43,8 +43,8 @@ func TestPatternsMarshalEmpty(t *testing.T) {
 func TestPatternsMarshalSingle(t *testing.T) {
 	expected := `name: golang
 patterns:
-    - /usr/bin/go
-    - /usr/share/golang
+    - /usr/bin/go # comment1
+    - /usr/share/golang # comment2
 `
 	value := struct {
 		Name     string       `yaml:"name"`
@@ -52,9 +52,17 @@ patterns:
 	}{
 		Name: "golang",
 		Patterns: ArrayListMap{
-			DefaultPackage: []string{
-				"/usr/bin/go",
-				"/usr/share/golang",
+			DefaultPackage: []*yaml.Node{
+				&yaml.Node{
+					Kind:        yaml.ScalarNode,
+					Value:       "/usr/bin/go",
+					LineComment: "# comment1",
+				},
+				&yaml.Node{
+					Kind:        yaml.ScalarNode,
+					Value:       "/usr/share/golang",
+					LineComment: "# comment2",
+				},
 			},
 		},
 	}
@@ -83,13 +91,25 @@ patterns:
 	}{
 		Name: "golang",
 		Patterns: ArrayListMap{
-			DefaultPackage: []string{
-				"/usr/bin/go",
-				"/usr/share/golang",
+			DefaultPackage: []*yaml.Node{
+				&yaml.Node{
+					Kind:  yaml.ScalarNode,
+					Value: "/usr/bin/go",
+				},
+				&yaml.Node{
+					Kind:  yaml.ScalarNode,
+					Value: "/usr/share/golang",
+				},
 			},
-			"devel": []string{
-				"/usr/include",
-				"/usr/share/golang/include",
+			"devel": []*yaml.Node{
+				&yaml.Node{
+					Kind:  yaml.ScalarNode,
+					Value: "/usr/include",
+				},
+				&yaml.Node{
+					Kind:  yaml.ScalarNode,
+					Value: "/usr/share/golang/include",
+				},
 			},
 		},
 	}
@@ -148,11 +168,11 @@ patterns:
 	if len(paths) != 2 {
 		t.Fatalf("expected 2 paths, found: %d", len(paths))
 	}
-	if paths[0] != "/usr/bin/go" {
-		t.Errorf("expected '%s', found: %s", "/usr/bin/go", paths[0])
+	if paths[0].Value != "/usr/bin/go" {
+		t.Errorf("expected '%s', found: %s", "/usr/bin/go", paths[0].Value)
 	}
-	if paths[1] != "/usr/share/golang" {
-		t.Errorf("expected '%s', found: %s", "/usr/share/golang", paths[0])
+	if paths[1].Value != "/usr/share/golang" {
+		t.Errorf("expected '%s', found: %s", "/usr/share/golang", paths[0].Value)
 	}
 }
 
@@ -186,20 +206,20 @@ patterns:
 	if len(paths) != 2 {
 		t.Fatalf("expected 2 paths, found: %d", len(paths))
 	}
-	if paths[0] != "/usr/bin/go" {
-		t.Errorf("expected '%s', found: %s", "/usr/bin/go", paths[0])
+	if paths[0].Value != "/usr/bin/go" {
+		t.Errorf("expected '%s', found: %s", "/usr/bin/go", paths[0].Value)
 	}
-	if paths[1] != "/usr/share/golang" {
-		t.Errorf("expected '%s', found: %s", "/usr/share/golang", paths[0])
+	if paths[1].Value != "/usr/share/golang" {
+		t.Errorf("expected '%s', found: %s", "/usr/share/golang", paths[0].Value)
 	}
 	paths = value.Patterns["devel"]
 	if len(paths) != 2 {
 		t.Fatalf("expected 2 paths, found: %d", len(paths))
 	}
-	if paths[0] != "/usr/include" {
-		t.Errorf("expected '%s', found: %s", "/usr/include", paths[0])
+	if paths[0].Value != "/usr/include" {
+		t.Errorf("expected '%s', found: %s", "/usr/include", paths[0].Value)
 	}
-	if paths[1] != "/usr/share/golang/include" {
-		t.Errorf("expected '%s', found: %s", "/usr/share/golang/include", paths[0])
+	if paths[1].Value != "/usr/share/golang/include" {
+		t.Errorf("expected '%s', found: %s", "/usr/share/golang/include", paths[0].Value)
 	}
 }

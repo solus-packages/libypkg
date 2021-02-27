@@ -35,13 +35,17 @@ func TestArrayMapMarshalEmpty(t *testing.T) {
 }
 
 func TestArrayMapMarshalSingle(t *testing.T) {
-	expected := "component: system.devel\n"
-	am := make(ArrayMap)
-	am[DefaultPackage] = "system.devel"
+	expected := "component: system.devel # comment\n"
 	value := struct {
 		Components ArrayMap `yaml:"component"`
 	}{
-		Components: am,
+		Components: ArrayMap{
+			DefaultPackage: &yaml.Node{
+				Kind:        yaml.ScalarNode,
+				Value:       "system.devel",
+				LineComment: "# comment",
+			},
+		},
 	}
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
@@ -58,13 +62,19 @@ func TestArrayMapMarshalMultiple(t *testing.T) {
     - system.devel
     - devel: programming.devel
 `
-	am := make(ArrayMap)
-	am[DefaultPackage] = "system.devel"
-	am["devel"] = "programming.devel"
 	value := struct {
 		Components ArrayMap `yaml:"component"`
 	}{
-		Components: am,
+		Components: ArrayMap{
+			DefaultPackage: &yaml.Node{
+				Kind:  yaml.ScalarNode,
+				Value: "system.devel",
+			},
+			"devel": &yaml.Node{
+				Kind:  yaml.ScalarNode,
+				Value: "programming.devel",
+			},
+		},
 	}
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
@@ -92,7 +102,7 @@ func TestArrayMapUnmarshalEmpty(t *testing.T) {
 }
 
 func TestArrayMapUnmarshalSingle(t *testing.T) {
-	input := "component: system.devel"
+	input := "component: system.devel # comment"
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
@@ -104,8 +114,12 @@ func TestArrayMapUnmarshalSingle(t *testing.T) {
 	if l := len(value.Components); l != 1 {
 		t.Fatalf("expected exactly one entry, found: %d", l)
 	}
-	if v := value.Components[DefaultPackage]; v != "system.devel" {
-		t.Errorf("expected 'system.devel', found: %s", v)
+	v := value.Components[DefaultPackage]
+	if v.Value != "system.devel" {
+		t.Errorf("expected 'system.devel', found: %s", v.Value)
+	}
+	if v.LineComment != "# comment" {
+		t.Errorf("expected 'system.devel', found: %s", v.Value)
 	}
 }
 
@@ -125,10 +139,10 @@ func TestArrayMapUnmarshalMultiple(t *testing.T) {
 	if l := len(value.Components); l != 2 {
 		t.Fatalf("expected exactly two entries, found: %d", l)
 	}
-	if v := value.Components[DefaultPackage]; v != "system.devel" {
+	if v := value.Components[DefaultPackage].Value; v != "system.devel" {
 		t.Errorf("expected 'system.devel', found: %s", v)
 	}
-	if v := value.Components["devel"]; v != "programming.devel" {
+	if v := value.Components["devel"].Value; v != "programming.devel" {
 		t.Errorf("expected 'programming.devel', found: %s", v)
 	}
 }

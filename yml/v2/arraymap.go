@@ -30,7 +30,7 @@ import (
 // component:
 //     - system.devel
 //     - docs: programming.tools
-type ArrayMap map[string]string
+type ArrayMap map[string]*yaml.Node
 
 // ErrInvalidMap indicates that an ArrayMap is either invalid or being filled by invalid YAML
 var ErrInvalidMap = errors.New("ArrayMap must be a single string or an array of key value pairs")
@@ -46,23 +46,20 @@ func (am ArrayMap) MarshalYAML() (out interface{}, err error) {
 	case 0:
 		err = ErrInvalidMap
 	case 1:
-		if len(am[DefaultPackage]) == 0 {
+		main, ok := am[DefaultPackage]
+		if !ok {
 			err = ErrInvalidMap
 			return
 		}
-		out = am[DefaultPackage]
+		out = main
 	case 2:
-		main := am[DefaultPackage]
-		if len(main) == 0 {
+		main, ok := am[DefaultPackage]
+		if !ok {
 			err = ErrInvalidMap
 			return
 		}
-		nodes := make([]yaml.Node, 0)
-		node := yaml.Node{
-			Kind:  yaml.ScalarNode,
-			Value: main,
-		}
-		nodes = append(nodes, node)
+		nodes := make([]*yaml.Node, 0)
+		nodes = append(nodes, main)
 		var names []string
 		for name := range am {
 			if name != DefaultPackage {
@@ -78,12 +75,8 @@ func (am ArrayMap) MarshalYAML() (out interface{}, err error) {
 				Kind:  yaml.ScalarNode,
 				Value: name,
 			}
-			value := yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Value: am[name],
-			}
-			node.Content = append(node.Content, &key, &value)
-			nodes = append(nodes, node)
+			node.Content = append(node.Content, &key, am[name])
+			nodes = append(nodes, &node)
 		}
 		out = nodes
 	}
@@ -94,12 +87,11 @@ func (am ArrayMap) MarshalYAML() (out interface{}, err error) {
 func (am *ArrayMap) UnmarshalYAML(value *yaml.Node) error {
 	switch value.Kind {
 	case yaml.ScalarNode:
-		v := value.Value
-		if len(v) == 0 {
+		if len(value.Value) == 0 {
 			return ErrInvalidMap
 		}
 		*am = make(ArrayMap)
-		(*am)[DefaultPackage] = v
+		(*am)[DefaultPackage] = value
 	case yaml.SequenceNode:
 		if len(value.Content) == 0 {
 			return ErrInvalidMap
@@ -109,7 +101,7 @@ func (am *ArrayMap) UnmarshalYAML(value *yaml.Node) error {
 			return ErrInvalidMap
 		}
 		m := make(ArrayMap)
-		m[DefaultPackage] = main.Value
+		m[DefaultPackage] = main
 		for _, node := range value.Content[1:] {
 			if node.Kind != yaml.MappingNode || len(node.Content) != 2 {
 				return ErrInvalidMap
@@ -122,7 +114,7 @@ func (am *ArrayMap) UnmarshalYAML(value *yaml.Node) error {
 			if v.Kind != yaml.ScalarNode || len(v.Value) == 0 {
 				return ErrInvalidMap
 			}
-			m[k.Value] = v.Value
+			m[k.Value] = v
 		}
 		*am = m
 	default:

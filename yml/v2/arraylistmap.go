@@ -31,7 +31,7 @@ import (
 // - red:
 //     - three
 //     - four
-type ArrayListMap map[string][]string
+type ArrayListMap map[string][]*yaml.Node
 
 // ErrInvalidListMap indicates that the specified YAML is invalid for this type
 var ErrInvalidListMap = errors.New("ArrayListMap must be a list of strings or a map of lists of strings")
@@ -42,16 +42,10 @@ func (am ArrayListMap) MarshalYAML() (out interface{}, err error) {
 		err = ErrInvalidListMap
 		return
 	}
-	nodes := make([]yaml.Node, 0)
+	nodes := make([]*yaml.Node, 0)
 	main := am[DefaultPackage]
 	if len(main) > 0 {
-		for _, pkg := range main {
-			node := yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Value: pkg,
-			}
-			nodes = append(nodes, node)
-		}
+		nodes = append(nodes, main...)
 	}
 	var names []string
 	for name := range am {
@@ -71,15 +65,11 @@ func (am ArrayListMap) MarshalYAML() (out interface{}, err error) {
 		value := yaml.Node{
 			Kind: yaml.SequenceNode,
 		}
-		for _, pkg := range am[name] {
-			child := yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Value: pkg,
-			}
-			value.Content = append(value.Content, &child)
+		for _, e := range am[name] {
+			value.Content = append(value.Content, e)
 		}
 		node.Content = append(node.Content, &key, &value)
-		nodes = append(nodes, node)
+		nodes = append(nodes, &node)
 	}
 	out = nodes
 	return
@@ -96,7 +86,7 @@ func (am *ArrayListMap) UnmarshalYAML(value *yaml.Node) error {
 	for _, node := range value.Content {
 		switch node.Kind {
 		case yaml.ScalarNode:
-			(*am)[DefaultPackage] = append((*am)[DefaultPackage], node.Value)
+			(*am)[DefaultPackage] = append((*am)[DefaultPackage], node)
 		case yaml.MappingNode:
 			if len(node.Content) != 2 {
 				return ErrInvalidListMap
@@ -113,7 +103,7 @@ func (am *ArrayListMap) UnmarshalYAML(value *yaml.Node) error {
 				if n.Kind != yaml.ScalarNode || len(n.Value) == 0 {
 					return ErrInvalidListMap
 				}
-				(*am)[k.Value] = append((*am)[k.Value], n.Value)
+				(*am)[k.Value] = append((*am)[k.Value], n)
 			}
 		default:
 			return ErrInvalidListMap

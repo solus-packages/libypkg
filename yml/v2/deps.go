@@ -16,10 +16,14 @@
 
 package v2
 
+import (
+	"gopkg.in/yaml.v3"
+)
+
 // PackageDeps includes the dependencies required for the Build, Check, and Run Stages
 type PackageDeps struct {
 	Replaces  ArrayListMap `yaml:"replaces,omitempty"`
 	Conflicts ArrayListMap `yaml:"conflicts,omitempty"`
-	Build     []string     `yaml:"builddeps,omitempty"`
+	Build     []yaml.Node  `yaml:"builddeps,omitempty"`
 	Run       ArrayListMap `yaml:"rundeps,omitempty"`
 }
