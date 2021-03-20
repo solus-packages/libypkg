@@ -14,11 +14,11 @@
 // limitations under the License.
 //
 
-package v3
+package v2
 
 import (
-	"dev.getsol.us/source/libypkg/yml/internal"
-	"dev.getsol.us/source/libypkg/yml/shared"
+	"dev.getsol.us/source/libypkg/spec/internal"
+	"dev.getsol.us/source/libypkg/spec/shared"
 )
 
 // BuildFlags are special options that configure the build process
@@ -38,7 +38,7 @@ type BuildFlags struct {
 	Strip      shared.DefaultTrue  `yaml:"strip,omitempty"`
 }
 
-// Convert translates a v3.BuildFlags to an internal.BuildFlags
+// Convert translates a v2.BuildFlags to an internal.BuildFlags
 func (flags BuildFlags) Convert() internal.BuildFlags {
 	return internal.BuildFlags{
 		AutoDep:    flags.AutoDep,
@@ -57,7 +57,7 @@ func (flags BuildFlags) Convert() internal.BuildFlags {
 	}
 }
 
-// Modify translates an internal.BuildFlags to a v3.BuildFlags
+// Modify translates an internal.BuildFlags to a v2.BuildFlags
 func (flags *BuildFlags) Modify(changes internal.BuildFlags) {
 	flags.AutoDep = changes.AutoDep
 	flags.AVX2 = changes.AVX2

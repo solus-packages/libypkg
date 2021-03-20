@@ -14,11 +14,10 @@
 // limitations under the License.
 //
 
-package v2
+package internal
 
 import (
-	"dev.getsol.us/source/libypkg/yml/internal"
-	"dev.getsol.us/source/libypkg/yml/shared"
+	"dev.getsol.us/source/libypkg/spec/shared"
 )
 
 // BuildFlags are special options that configure the build process
@@ -36,40 +35,4 @@ type BuildFlags struct {
 	Networking shared.DefaultFalse `yaml:"networking,omitempty"`
 	Optimize   []string            `yaml:"optimize,omitempty"`
 	Strip      shared.DefaultTrue  `yaml:"strip,omitempty"`
-}
-
-// Convert translates a v2.BuildFlags to an internal.BuildFlags
-func (flags BuildFlags) Convert() internal.BuildFlags {
-	return internal.BuildFlags{
-		AutoDep:    flags.AutoDep,
-		AVX2:       flags.AVX2,
-		Clang:      flags.Clang,
-		CCache:     flags.CCache,
-		Debug:      flags.Debug,
-		Devel:      flags.Devel,
-		Emul32:     flags.Emul32,
-		Extract:    flags.Extract,
-		LAStrip:    flags.LAStrip,
-		LibSplit:   flags.LibSplit,
-		Networking: flags.Networking,
-		Optimize:   flags.Optimize,
-		Strip:      flags.Strip,
-	}
-}
-
-// Modify translates an internal.BuildFlags to a v2.BuildFlags
-func (flags *BuildFlags) Modify(changes internal.BuildFlags) {
-	flags.AutoDep = changes.AutoDep
-	flags.AVX2 = changes.AVX2
-	flags.Clang = changes.Clang
-	flags.CCache = changes.CCache
-	flags.Debug = changes.Debug
-	flags.Devel = changes.Devel
-	flags.Emul32 = changes.Emul32
-	flags.Extract = changes.Extract
-	flags.LAStrip = changes.LAStrip
-	flags.LibSplit = changes.LibSplit
-	flags.Networking = changes.Networking
-	flags.Optimize = changes.Optimize
-	flags.Strip = changes.Strip
 }

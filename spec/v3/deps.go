@@ -14,36 +14,39 @@
 // limitations under the License.
 //
 
-package v2
+package v3
 
 import (
-	"dev.getsol.us/source/libypkg/yml/internal"
-	"dev.getsol.us/source/libypkg/yml/shared/array"
+	"dev.getsol.us/source/libypkg/spec/internal"
+	"dev.getsol.us/source/libypkg/spec/shared/array"
 	"gopkg.in/yaml.v3"
 )
 
-// PackageDeps includes the dependencies required for the Build, Check, and Run Stages
+// PackageDeps includes the dependencies required at Build, Check, and Run time
 type PackageDeps struct {
 	Replaces  array.ListMap `yaml:"replaces,omitempty"`
 	Conflicts array.ListMap `yaml:"conflicts,omitempty"`
-	Build     []yaml.Node   `yaml:"builddeps,omitempty"`
-	Run       array.ListMap `yaml:"rundeps,omitempty"`
+	Build     []yaml.Node   `yaml:"build,omitempty"`
+	Check     []yaml.Node   `yaml:"check,omitempty"`
+	Run       array.ListMap `yaml:"run,omitempty"`
 }
 
-// Convert translates a v2.PackageDeps to an internal.PackageDeps
+// Convert translates a v3.PackageDeps to an internal.PackageDeps
 func (deps PackageDeps) Convert() internal.PackageDeps {
 	return internal.PackageDeps{
 		Replaces:  deps.Replaces,
 		Conflicts: deps.Conflicts,
 		Build:     deps.Build,
+		Check:     deps.Check,
 		Run:       deps.Run,
 	}
 }
 
-// Modify translates an internal.PackageDeps to a v2.PackageDeps
+// Modify translates an internal.PackageDeps to a v3.PackageDeps
 func (deps *PackageDeps) Modify(changes internal.PackageDeps) {
 	deps.Replaces = changes.Replaces
 	deps.Conflicts = changes.Conflicts
-	deps.Build = append(changes.Build, changes.Check...)
+	deps.Build = changes.Build
+	deps.Check = changes.Check
 	deps.Run = changes.Run
 }

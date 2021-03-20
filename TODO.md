@@ -10,6 +10,7 @@
     - [x] Add a function for converting from internal.Package to a versions format
 - [x] Create a generic function for loading any PackageSpec
 - [x] Implement conversions for the different PackageSpecs
+- [x] Rename `yml` package to `spec`
 
 ## CLI
 

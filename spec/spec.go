@@ -14,12 +14,12 @@
 // limitations under the License.
 //
 
-package yml
+package spec
 
 import (
-	"dev.getsol.us/source/libypkg/yml/internal"
-	"dev.getsol.us/source/libypkg/yml/v2"
-	"dev.getsol.us/source/libypkg/yml/v3"
+	"dev.getsol.us/source/libypkg/spec/internal"
+	"dev.getsol.us/source/libypkg/spec/v2"
+	"dev.getsol.us/source/libypkg/spec/v3"
 	"errors"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -31,8 +31,8 @@ var (
 	ErrInvalidVersion = errors.New("invalid ypkg version specified")
 )
 
-// PackageSpec is a common interface to all version of the Package YML specification
-type PackageSpec interface {
+// Package is a common interface to all version of the Package YML specification
+type Package interface {
 	// Load populates a PackageYML version by reading in the contents from a specific filepath
 	Load(path string, mode int) error
 	// Convert turns a versioned PackageYML into the intermediate internal.PackageYML representation
@@ -48,7 +48,7 @@ type PackageSpec interface {
 }
 
 // Load reads in any supported package.yml from file
-func Load(path string) (pkg PackageSpec, err error) {
+func Load(path string) (pkg Package, err error) {
 	ypkg, err := DetectFormat(path)
 	if err != nil {
 		return
@@ -81,7 +81,7 @@ func DetectFormat(path string) (ypkg int, err error) {
 }
 
 // NewPackage creates and empty package of the specified version, if supported
-func NewPackage(ypkg int, f *os.File) (pkg PackageSpec, err error) {
+func NewPackage(ypkg int, f *os.File) (pkg Package, err error) {
 	switch ypkg {
 	case 2:
 		pkg = v2.NewPackage(f)
@@ -94,7 +94,7 @@ func NewPackage(ypkg int, f *os.File) (pkg PackageSpec, err error) {
 }
 
 // Auto generates a new package my inspecting the contents of a list of sources
-func Auto(sources []string) (pkg PackageSpec, err error) {
+func Auto(sources []string) (pkg Package, err error) {
 	def, err := internal.Auto(sources)
 	if err != nil {
 		return
@@ -108,7 +108,7 @@ func Auto(sources []string) (pkg PackageSpec, err error) {
 }
 
 // Bump increments the release number of a package.yml
-func Bump(path string) (pkg PackageSpec, err error) {
+func Bump(path string) (pkg Package, err error) {
 	if pkg, err = Load(path); err != nil {
 		return
 	}
@@ -122,7 +122,7 @@ func Bump(path string) (pkg PackageSpec, err error) {
 }
 
 // Convert a package.yml from any version to another
-func Convert(path string, ypkg int) (pkg PackageSpec, err error) {
+func Convert(path string, ypkg int) (pkg Package, err error) {
 	original, err := Load(path)
 	if err != nil {
 		return
@@ -141,7 +141,7 @@ func Convert(path string, ypkg int) (pkg PackageSpec, err error) {
 }
 
 // Init creates a new package.yml with the required field pre-populated like a template
-func Init(path string) (pkg PackageSpec, err error) {
+func Init(path string) (pkg Package, err error) {
 	pkg = &v2.PackageYML{}
 	if err = pkg.Load(path, os.O_CREATE); err != nil {
 		return
@@ -151,7 +151,7 @@ func Init(path string) (pkg PackageSpec, err error) {
 }
 
 // Lint checks for errors and common mistakes in package.yml
-func Lint(path string) (pkg PackageSpec, err error) {
+func Lint(path string) (pkg Package, err error) {
 	if pkg, err = Load(path); err != nil {
 		return
 	}
@@ -164,7 +164,7 @@ func Lint(path string) (pkg PackageSpec, err error) {
 }
 
 // Update modifies the sources in an existing package.yml and overwrites the existing file
-func Update(path, version string, sources []string) (pkg PackageSpec, err error) {
+func Update(path, version string, sources []string) (pkg Package, err error) {
 	original, err := Load(path)
 	if err != nil {
 		return

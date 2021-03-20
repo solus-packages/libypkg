@@ -17,7 +17,7 @@
 package array
 
 import (
-	"dev.getsol.us/source/libypkg/yml/shared/constant"
+	"dev.getsol.us/source/libypkg/spec/shared/constant"
 	"gopkg.in/yaml.v3"
 	"strings"
 	"testing"

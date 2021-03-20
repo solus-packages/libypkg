@@ -14,11 +14,11 @@
 // limitations under the License.
 //
 
-package internal
+package v3
 
 import (
-	"dev.getsol.us/source/libypkg/yml/shared/array"
-	"dev.getsol.us/source/libypkg/yml/shared/constant"
+	"dev.getsol.us/source/libypkg/spec/shared/array"
+	"dev.getsol.us/source/libypkg/spec/shared/constant"
 	"gopkg.in/yaml.v3"
 	"strings"
 	"testing"

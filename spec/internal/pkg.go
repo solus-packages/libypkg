@@ -17,8 +17,8 @@
 package internal
 
 import (
-	"dev.getsol.us/source/libypkg/yml/shared"
-	"dev.getsol.us/source/libypkg/yml/shared/array"
+	"dev.getsol.us/source/libypkg/spec/shared"
+	"dev.getsol.us/source/libypkg/spec/shared/array"
 	"errors"
 	"gopkg.in/yaml.v3"
 )
