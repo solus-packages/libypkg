@@ -54,7 +54,10 @@ func Load(path string) (pkg Package, err error) {
 		return
 	}
 	pkg, err = NewPackage(ypkg, nil)
-	err = pkg.Load(path, 0644)
+	if err != nil {
+		return err
+	}
+	err = pkg.Load(path, os.O_RDWR)
 	return
 }
 
