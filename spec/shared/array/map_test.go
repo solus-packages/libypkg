@@ -27,11 +27,11 @@ func TestMapMarshalEmpty(t *testing.T) {
 	var am Map
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
-	if err := enc.Encode(am); err != ErrInvalidMap {
-		t.Fatalf("Expected ErrNotLicense, found: %s", err)
+	if err := enc.Encode(am); err != nil {
+		t.Fatalf("Expected no error, found: %s", err)
 	}
-	if result := out.String(); len(result) != 0 {
-		t.Fatalf("Expected empty result, found: %s", result)
+	if result := out.String(); result != "null\n" {
+		t.Fatalf("Expected null result, found: %s", result)
 	}
 }
 
