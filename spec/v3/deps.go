@@ -31,6 +31,15 @@ type PackageDeps struct {
 	Run       array.ListMap `yaml:"run,omitempty"`
 }
 
+// NewPackageDeps retuns an empty PackageDeps
+func NewPackageDeps() PackageDeps {
+	return PackageDeps{
+		Replaces:  array.NewListMap(),
+		Conflicts: array.NewListMap(),
+		Run:       array.NewListMap(),
+	}
+}
+
 // Convert translates a v3.PackageDeps to an internal.PackageDeps
 func (deps PackageDeps) Convert() internal.PackageDeps {
 	return internal.PackageDeps{

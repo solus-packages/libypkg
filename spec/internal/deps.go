@@ -29,3 +29,12 @@ type PackageDeps struct {
 	Check     []yaml.Node   `yaml:"check,omitempty"`
 	Run       array.ListMap `yaml:"run,omitempty"`
 }
+
+// NewPackageDeps retuns an empty PackageDeps
+func NewPackageDeps() PackageDeps {
+	return PackageDeps{
+		Replaces:  array.NewListMap(),
+		Conflicts: array.NewListMap(),
+		Run:       array.NewListMap(),
+	}
+}

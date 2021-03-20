@@ -34,6 +34,11 @@ import (
 //     - four
 type ListMap map[string][]*yaml.Node
 
+// NewListMap returns an empty ListMap
+func NewListMap() ListMap {
+	return make(ListMap)
+}
+
 // ErrInvalidListMap indicates that the specified YAML is invalid for this type
 var ErrInvalidListMap = errors.New("ListMap must be a list of strings or a map of lists of strings")
 

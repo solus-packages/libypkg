@@ -48,27 +48,32 @@ type PackageYML struct {
 // NewPackage creates a new Package with an optional file argument
 func NewPackage(f *os.File) *PackageYML {
 	return &PackageYML{
-		f: f,
+		f:            f,
+		Component:    array.NewMap(),
+		Summary:      array.NewMap(),
+		Description:  array.NewMap(),
+		Dependencies: NewPackageDeps(),
+		Permanent:    array.NewListMap(),
+		Patterns:     array.NewListMap(),
 	}
 }
 
 // Convert translates a v2.PackageYML to an internal.Package.YML
 func (p *PackageYML) Convert() (pkg *internal.PackageYML, err error) {
-	pkg = &internal.PackageYML{
-		YPKG:         2,
-		Name:         p.Name,
-		Version:      p.Version,
-		Release:      p.Release,
-		Source:       p.Source,
-		Homepage:     p.Homepage,
-		License:      p.License,
-		Dependencies: p.Dependencies.Convert(),
-		Flags:        p.Flags.Convert(),
-		Environment:  p.Environment,
-		Stages:       p.Stages.Convert(),
-		Permanent:    p.Permanent,
-		Patterns:     p.Patterns,
-	}
+	pkg = internal.NewPackage()
+	pkg.YPKG = 2
+	pkg.Name = p.Name
+	pkg.Version = p.Version
+	pkg.Release = p.Release
+	pkg.Source = p.Source
+	pkg.Homepage = p.Homepage
+	pkg.License = p.License
+	pkg.Dependencies = p.Dependencies.Convert()
+	pkg.Flags = p.Flags.Convert()
+	pkg.Environment = p.Environment
+	pkg.Stages = p.Stages.Convert()
+	pkg.Permanent = p.Permanent
+	pkg.Patterns = p.Patterns
 	if len(p.Component) == 1 {
 		pkg.Component = p.Component[constant.DefaultPackage].Value
 	} else {

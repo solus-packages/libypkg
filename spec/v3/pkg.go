@@ -51,7 +51,13 @@ type PackageYML struct {
 // NewPackage creates a new Package with an optional file argument
 func NewPackage(f *os.File) *PackageYML {
 	return &PackageYML{
-		f: f,
+		f:            f,
+		Components:   array.NewMap(),
+		Summaries:    array.NewMap(),
+		Descriptions: array.NewMap(),
+		Dependencies: NewPackageDeps(),
+		Permanent:    array.NewListMap(),
+		Patterns:     array.NewListMap(),
 	}
 }
 

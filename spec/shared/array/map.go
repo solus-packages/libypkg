@@ -33,6 +33,11 @@ import (
 //     - docs: programming.tools
 type Map map[string]*yaml.Node
 
+// NewMap creates an empty Map
+func NewMap() Map {
+	return make(Map)
+}
+
 // ErrInvalidMap indicates that an Map is either invalid or being filled by invalid YAML
 var ErrInvalidMap = errors.New("Map must be a single string or an array of key value pairs")
 

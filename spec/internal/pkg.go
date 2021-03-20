@@ -46,6 +46,18 @@ type PackageYML struct {
 	Patterns     array.ListMap   `yaml:"patterns,omitempty"`
 }
 
+// NewPackage returns an empty package
+func NewPackage() *PackageYML {
+	return &PackageYML{
+		Components:   array.NewMap(),
+		Summaries:    array.NewMap(),
+		Descriptions: array.NewMap(),
+		Dependencies: NewPackageDeps(),
+		Permanent:    array.NewListMap(),
+		Patterns:     array.NewListMap(),
+	}
+}
+
 // Default provides a skeleton for a new package
 func Default() *PackageYML {
 	return &PackageYML{
