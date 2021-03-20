@@ -44,8 +44,6 @@ var ErrInvalidMap = errors.New("Map must be a single string or an array of key v
 // MarshalYAML handles custom marshaling for Map
 func (am Map) MarshalYAML() (out interface{}, err error) {
 	switch len(am) {
-	case 0:
-		err = ErrInvalidMap
 	case 1:
 		main, ok := am[constant.DefaultPackage]
 		if !ok {

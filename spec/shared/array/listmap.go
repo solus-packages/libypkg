@@ -45,7 +45,6 @@ var ErrInvalidListMap = errors.New("ListMap must be a list of strings or a map o
 // MarshalYAML is a custom marshaler to handle this type
 func (am ListMap) MarshalYAML() (out interface{}, err error) {
 	if len(am) == 0 {
-		err = ErrInvalidListMap
 		return
 	}
 	nodes := make([]*yaml.Node, 0)
