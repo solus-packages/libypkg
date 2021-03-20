@@ -29,7 +29,7 @@ type PackageYML struct {
 	Name         string          `yaml:"name"`
 	Version      string          `yaml:"version"`
 	Release      uint            `yaml:"release"`
-	Source       []shared.Source `yaml:"shared.Source"`
+	Source       []shared.Source `yaml:"source"`
 	Homepage     string          `yaml:"homepage,omitempty"`
 	License      shared.Licenses `yaml:"license"`
 	Component    string          `yaml:"component"`
