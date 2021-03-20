@@ -145,10 +145,11 @@ func Convert(path string, ypkg int) (pkg Package, err error) {
 
 // Init creates a new package.yml with the required field pre-populated like a template
 func Init(path string) (pkg Package, err error) {
-	pkg = &v2.PackageYML{}
-	if err = pkg.Load(path, os.O_CREATE|os.O_RDWR); err != nil {
+	f, err := os.Create(path)
+	if err != nil {
 		return
 	}
+	pkg = v2.NewPackage(f)
 	err = pkg.Modify(*internal.Default())
 	return
 }
