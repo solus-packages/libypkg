@@ -14,11 +14,7 @@
 // limitations under the License.
 //
 
-package v2
-
-import (
-	"dev.getsol.us/source/libypkg/yml/internal"
-)
+package internal
 
 // BuildStages represent the scripted commands to execute for each stage of the build process
 type BuildStages struct {
@@ -27,24 +23,4 @@ type BuildStages struct {
 	Profile string `yaml:"profile,omitempty"`
 	Check   string `yaml:"check,omitempty"`
 	Install string `yaml:"install"`
-}
-
-// Convert translate a v2.BuildStags to an internal.BuildStages
-func (stages BuildStages) Convert() internal.BuildStages {
-	return internal.BuildStages{
-		Setup:   stages.Setup,
-		Build:   stages.Build,
-		Profile: stages.Profile,
-		Check:   stages.Check,
-		Install: stages.Install,
-	}
-}
-
-// Modify translate an internal.BuildStags to a v2.BuildStages
-func (stages *BuildStages) Modify(changes internal.BuildStages) {
-	stages.Setup = changes.Setup
-	stages.Build = changes.Build
-	stages.Profile = changes.Profile
-	stages.Check = changes.Check
-	stages.Install = changes.Install
 }

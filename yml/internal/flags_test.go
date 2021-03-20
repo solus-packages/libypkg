@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package v2
+package internal
 
 import (
 	"dev.getsol.us/source/libypkg/yml/shared"

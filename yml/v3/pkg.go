@@ -14,30 +14,33 @@
 // limitations under the License.
 //
 
-package v2
+package v3
 
 import (
 	"dev.getsol.us/source/libypkg/yml/internal"
 	"dev.getsol.us/source/libypkg/yml/shared"
 	"dev.getsol.us/source/libypkg/yml/shared/array"
-	"dev.getsol.us/source/libypkg/yml/shared/constant"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
 // PackageYML is the v3 representation of the Package YML specification
 type PackageYML struct {
+	YPKG         int             `yaml:"YPKG"`
 	Name         string          `yaml:"name"`
 	Version      string          `yaml:"version"`
 	Release      uint            `yaml:"release"`
 	Source       []shared.Source `yaml:"shared.Source"`
 	Homepage     string          `yaml:"homepage,omitempty"`
 	License      shared.Licenses `yaml:"license"`
-	Component    array.Map       `yaml:"component"`
-	Summary      array.Map       `yaml:"summary"`
-	Description  array.Map       `yaml:"description"`
-	Dependencies PackageDeps     `yaml:"dependencies,inline,omitempty"`
-	Flags        BuildFlags      `yaml:",omitempty,inline"`
+	Component    string          `yaml:"component"`
+	Components   array.Map       `yaml:"components"`
+	Summary      string          `yaml:"summary"`
+	Summaries    array.Map       `yaml:"summaries"`
+	Description  string          `yaml:"description"`
+	Descriptions array.Map       `yaml:"descriptions"`
+	Dependencies PackageDeps     `yaml:"deps,omitempty"`
+	Flags        BuildFlags      `yaml:"flags,omitempty"`
 	Environment  string          `yaml:"environment,omitempty"`
 	Stages       BuildStages     `yaml:",inline"`
 	Permanent    array.ListMap   `yaml:"permanent,omitempty"`
@@ -52,16 +55,22 @@ func NewPackage(f *os.File) *PackageYML {
 	}
 }
 
-// Convert translates a v2.PackageYML to an internal.Package.YML
+// Convert translates a v3.PackageYML to an internal.Package.YML
 func (p *PackageYML) Convert() (pkg *internal.PackageYML, err error) {
 	pkg = &internal.PackageYML{
-		YPKG:         2,
+		YPKG:         p.YPKG,
 		Name:         p.Name,
 		Version:      p.Version,
 		Release:      p.Release,
 		Source:       p.Source,
 		Homepage:     p.Homepage,
 		License:      p.License,
+		Component:    p.Component,
+		Components:   p.Components,
+		Summary:      p.Summary,
+		Summaries:    p.Summaries,
+		Description:  p.Description,
+		Descriptions: p.Descriptions,
 		Dependencies: p.Dependencies.Convert(),
 		Flags:        p.Flags.Convert(),
 		Environment:  p.Environment,
@@ -69,56 +78,24 @@ func (p *PackageYML) Convert() (pkg *internal.PackageYML, err error) {
 		Permanent:    p.Permanent,
 		Patterns:     p.Patterns,
 	}
-	if len(p.Component) == 1 {
-		pkg.Component = p.Component[constant.DefaultPackage].Value
-	} else {
-		pkg.Components = p.Component
-	}
-	if len(p.Summary) == 1 {
-		pkg.Summary = p.Summary[constant.DefaultPackage].Value
-	} else {
-		pkg.Summaries = p.Summary
-	}
-	if len(p.Description) == 1 {
-		pkg.Description = p.Description[constant.DefaultPackage].Value
-	} else {
-		pkg.Descriptions = p.Description
-	}
 	return
 }
 
 // Modify converts an internal.PackageYML to a v2.PackageYML
 func (p *PackageYML) Modify(pkg internal.PackageYML) error {
+	p.YPKG = pkg.YPKG
 	p.Name = pkg.Name
 	p.Version = pkg.Version
 	p.Release = pkg.Release
 	p.Source = pkg.Source
 	p.Homepage = pkg.Homepage
 	p.License = pkg.License
-	if len(pkg.Components) == 0 {
-		p.Component[constant.DefaultPackage] = &yaml.Node{
-			Kind:  yaml.ScalarNode,
-			Value: pkg.Component,
-		}
-	} else {
-		p.Component = pkg.Components
-	}
-	if len(pkg.Summaries) == 0 {
-		p.Summary[constant.DefaultPackage] = &yaml.Node{
-			Kind:  yaml.ScalarNode,
-			Value: pkg.Summary,
-		}
-	} else {
-		p.Summary = pkg.Summaries
-	}
-	if len(pkg.Descriptions) == 0 {
-		p.Description[constant.DefaultPackage] = &yaml.Node{
-			Kind:  yaml.ScalarNode,
-			Value: pkg.Description,
-		}
-	} else {
-		p.Description = pkg.Descriptions
-	}
+	p.Component = pkg.Component
+	p.Components = pkg.Components
+	p.Summary = pkg.Summary
+	p.Summaries = pkg.Summaries
+	p.Description = pkg.Description
+	p.Descriptions = pkg.Descriptions
 	p.Dependencies.Modify(pkg.Dependencies)
 	p.Flags.Modify(pkg.Flags)
 	p.Environment = pkg.Environment

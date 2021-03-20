@@ -14,15 +14,16 @@
 // limitations under the License.
 //
 
-package v2
+package array
 
 import (
+	"dev.getsol.us/source/libypkg/yml/shared/constant"
 	"errors"
 	"gopkg.in/yaml.v3"
 	"sort"
 )
 
-// ArrayListMap is a YAML list which gets read into a map
+// ListMap is a YAML list which gets read into a map
 //
 // Example:
 //
@@ -31,25 +32,25 @@ import (
 // - red:
 //     - three
 //     - four
-type ArrayListMap map[string][]*yaml.Node
+type ListMap map[string][]*yaml.Node
 
 // ErrInvalidListMap indicates that the specified YAML is invalid for this type
-var ErrInvalidListMap = errors.New("ArrayListMap must be a list of strings or a map of lists of strings")
+var ErrInvalidListMap = errors.New("ListMap must be a list of strings or a map of lists of strings")
 
 // MarshalYAML is a custom marshaler to handle this type
-func (am ArrayListMap) MarshalYAML() (out interface{}, err error) {
+func (am ListMap) MarshalYAML() (out interface{}, err error) {
 	if len(am) == 0 {
 		err = ErrInvalidListMap
 		return
 	}
 	nodes := make([]*yaml.Node, 0)
-	main := am[DefaultPackage]
+	main := am[constant.DefaultPackage]
 	if len(main) > 0 {
 		nodes = append(nodes, main...)
 	}
 	var names []string
 	for name := range am {
-		if name != DefaultPackage {
+		if name != constant.DefaultPackage {
 			names = append(names, name)
 		}
 	}
@@ -76,7 +77,7 @@ func (am ArrayListMap) MarshalYAML() (out interface{}, err error) {
 }
 
 // UnmarshalYAML is a custom unmarshaler to handle this type
-func (am *ArrayListMap) UnmarshalYAML(value *yaml.Node) error {
+func (am *ListMap) UnmarshalYAML(value *yaml.Node) error {
 	if value.Kind != yaml.SequenceNode {
 		return ErrInvalidListMap
 	}
@@ -86,13 +87,13 @@ func (am *ArrayListMap) UnmarshalYAML(value *yaml.Node) error {
 	for _, node := range value.Content {
 		switch node.Kind {
 		case yaml.ScalarNode:
-			(*am)[DefaultPackage] = append((*am)[DefaultPackage], node)
+			(*am)[constant.DefaultPackage] = append((*am)[constant.DefaultPackage], node)
 		case yaml.MappingNode:
 			if len(node.Content) != 2 {
 				return ErrInvalidListMap
 			}
 			k := node.Content[0]
-			if k.Kind != yaml.ScalarNode || len(k.Value) == 0 || k.Value == DefaultPackage {
+			if k.Kind != yaml.ScalarNode || len(k.Value) == 0 || k.Value == constant.DefaultPackage {
 				return ErrInvalidListMap
 			}
 			v := node.Content[1]

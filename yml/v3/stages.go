@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package v2
+package v3
 
 import (
 	"dev.getsol.us/source/libypkg/yml/internal"
@@ -29,7 +29,7 @@ type BuildStages struct {
 	Install string `yaml:"install"`
 }
 
-// Convert translate a v2.BuildStags to an internal.BuildStages
+// Convert translate a v3.BuildStags to an internal.BuildStages
 func (stages BuildStages) Convert() internal.BuildStages {
 	return internal.BuildStages{
 		Setup:   stages.Setup,
@@ -40,7 +40,7 @@ func (stages BuildStages) Convert() internal.BuildStages {
 	}
 }
 
-// Modify translate an internal.BuildStags to a v2.BuildStages
+// Modify translate an internal.BuildStags to a v3.BuildStages
 func (stages *BuildStages) Modify(changes internal.BuildStages) {
 	stages.Setup = changes.Setup
 	stages.Build = changes.Build

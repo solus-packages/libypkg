@@ -14,15 +14,16 @@
 // limitations under the License.
 //
 
-package v2
+package array
 
 import (
+	"dev.getsol.us/source/libypkg/yml/shared/constant"
 	"errors"
 	"gopkg.in/yaml.v3"
 	"sort"
 )
 
-// ArrayMap is a YAML list or single value that gets read in as a map
+// Map is a YAML list or single value that gets read in as a map
 //
 // Examples:
 // component: system.devel
@@ -30,30 +31,25 @@ import (
 // component:
 //     - system.devel
 //     - docs: programming.tools
-type ArrayMap map[string]*yaml.Node
+type Map map[string]*yaml.Node
 
-// ErrInvalidMap indicates that an ArrayMap is either invalid or being filled by invalid YAML
-var ErrInvalidMap = errors.New("ArrayMap must be a single string or an array of key value pairs")
+// ErrInvalidMap indicates that an Map is either invalid or being filled by invalid YAML
+var ErrInvalidMap = errors.New("Map must be a single string or an array of key value pairs")
 
-const (
-	// DefaultPackage specifies a reserved package name for the main package in a map
-	DefaultPackage = "^"
-)
-
-// MarshalYAML handles custom marshaling for ArrayMap
-func (am ArrayMap) MarshalYAML() (out interface{}, err error) {
+// MarshalYAML handles custom marshaling for Map
+func (am Map) MarshalYAML() (out interface{}, err error) {
 	switch len(am) {
 	case 0:
 		err = ErrInvalidMap
 	case 1:
-		main, ok := am[DefaultPackage]
+		main, ok := am[constant.DefaultPackage]
 		if !ok {
 			err = ErrInvalidMap
 			return
 		}
 		out = main
 	case 2:
-		main, ok := am[DefaultPackage]
+		main, ok := am[constant.DefaultPackage]
 		if !ok {
 			err = ErrInvalidMap
 			return
@@ -62,7 +58,7 @@ func (am ArrayMap) MarshalYAML() (out interface{}, err error) {
 		nodes = append(nodes, main)
 		var names []string
 		for name := range am {
-			if name != DefaultPackage {
+			if name != constant.DefaultPackage {
 				names = append(names, name)
 			}
 		}
@@ -83,15 +79,15 @@ func (am ArrayMap) MarshalYAML() (out interface{}, err error) {
 	return
 }
 
-// UnmarshalYAML handles custom unmarshaling for ArrayMap
-func (am *ArrayMap) UnmarshalYAML(value *yaml.Node) error {
+// UnmarshalYAML handles custom unmarshaling for Map
+func (am *Map) UnmarshalYAML(value *yaml.Node) error {
 	switch value.Kind {
 	case yaml.ScalarNode:
 		if len(value.Value) == 0 {
 			return ErrInvalidMap
 		}
-		*am = make(ArrayMap)
-		(*am)[DefaultPackage] = value
+		*am = make(Map)
+		(*am)[constant.DefaultPackage] = value
 	case yaml.SequenceNode:
 		if len(value.Content) == 0 {
 			return ErrInvalidMap
@@ -100,14 +96,14 @@ func (am *ArrayMap) UnmarshalYAML(value *yaml.Node) error {
 		if main.Kind != yaml.ScalarNode || len(main.Value) == 0 {
 			return ErrInvalidMap
 		}
-		m := make(ArrayMap)
-		m[DefaultPackage] = main
+		m := make(Map)
+		m[constant.DefaultPackage] = main
 		for _, node := range value.Content[1:] {
 			if node.Kind != yaml.MappingNode || len(node.Content) != 2 {
 				return ErrInvalidMap
 			}
 			k := node.Content[0]
-			if k.Kind != yaml.ScalarNode || len(k.Value) == 0 || k.Value == DefaultPackage {
+			if k.Kind != yaml.ScalarNode || len(k.Value) == 0 || k.Value == constant.DefaultPackage {
 				return ErrInvalidMap
 			}
 			v := node.Content[1]

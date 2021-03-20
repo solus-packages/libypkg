@@ -14,16 +14,17 @@
 // limitations under the License.
 //
 
-package v2
+package array
 
 import (
+	"dev.getsol.us/source/libypkg/yml/shared/constant"
 	"gopkg.in/yaml.v3"
 	"strings"
 	"testing"
 )
 
-func TestArrayMapMarshalEmpty(t *testing.T) {
-	var am ArrayMap
+func TestMapMarshalEmpty(t *testing.T) {
+	var am Map
 	var out strings.Builder
 	enc := yaml.NewEncoder(&out)
 	if err := enc.Encode(am); err != ErrInvalidMap {
@@ -34,13 +35,13 @@ func TestArrayMapMarshalEmpty(t *testing.T) {
 	}
 }
 
-func TestArrayMapMarshalSingle(t *testing.T) {
+func TestMapMarshalSingle(t *testing.T) {
 	expected := "component: system.devel # comment\n"
 	value := struct {
-		Components ArrayMap `yaml:"component"`
+		Components Map `yaml:"component"`
 	}{
-		Components: ArrayMap{
-			DefaultPackage: &yaml.Node{
+		Components: Map{
+			constant.DefaultPackage: &yaml.Node{
 				Kind:        yaml.ScalarNode,
 				Value:       "system.devel",
 				LineComment: "# comment",
@@ -57,16 +58,16 @@ func TestArrayMapMarshalSingle(t *testing.T) {
 	}
 }
 
-func TestArrayMapMarshalMultiple(t *testing.T) {
+func TestMapMarshalMultiple(t *testing.T) {
 	expected := `component:
     - system.devel
     - devel: programming.devel
 `
 	value := struct {
-		Components ArrayMap `yaml:"component"`
+		Components Map `yaml:"component"`
 	}{
-		Components: ArrayMap{
-			DefaultPackage: &yaml.Node{
+		Components: Map{
+			constant.DefaultPackage: &yaml.Node{
 				Kind:  yaml.ScalarNode,
 				Value: "system.devel",
 			},
@@ -86,12 +87,12 @@ func TestArrayMapMarshalMultiple(t *testing.T) {
 	}
 }
 
-func TestArrayMapUnmarshalEmpty(t *testing.T) {
+func TestMapUnmarshalEmpty(t *testing.T) {
 	input := "component:"
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		Components ArrayMap `yaml:"component"`
+		Components Map `yaml:"component"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
@@ -101,12 +102,12 @@ func TestArrayMapUnmarshalEmpty(t *testing.T) {
 	}
 }
 
-func TestArrayMapUnmarshalSingle(t *testing.T) {
+func TestMapUnmarshalSingle(t *testing.T) {
 	input := "component: system.devel # comment"
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		Components ArrayMap `yaml:"component"`
+		Components Map `yaml:"component"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
@@ -114,7 +115,7 @@ func TestArrayMapUnmarshalSingle(t *testing.T) {
 	if l := len(value.Components); l != 1 {
 		t.Fatalf("expected exactly one entry, found: %d", l)
 	}
-	v := value.Components[DefaultPackage]
+	v := value.Components[constant.DefaultPackage]
 	if v.Value != "system.devel" {
 		t.Errorf("expected 'system.devel', found: %s", v.Value)
 	}
@@ -123,7 +124,7 @@ func TestArrayMapUnmarshalSingle(t *testing.T) {
 	}
 }
 
-func TestArrayMapUnmarshalMultiple(t *testing.T) {
+func TestMapUnmarshalMultiple(t *testing.T) {
 	input := `component:
      - system.devel
      - devel: programming.devel
@@ -131,7 +132,7 @@ func TestArrayMapUnmarshalMultiple(t *testing.T) {
 	in := strings.NewReader(input)
 	dec := yaml.NewDecoder(in)
 	var value struct {
-		Components ArrayMap `yaml:"component"`
+		Components Map `yaml:"component"`
 	}
 	if err := dec.Decode(&value); err != nil {
 		t.Fatalf("Expected no error, found: %s", err)
@@ -139,7 +140,7 @@ func TestArrayMapUnmarshalMultiple(t *testing.T) {
 	if l := len(value.Components); l != 2 {
 		t.Fatalf("expected exactly two entries, found: %d", l)
 	}
-	if v := value.Components[DefaultPackage].Value; v != "system.devel" {
+	if v := value.Components[constant.DefaultPackage].Value; v != "system.devel" {
 		t.Errorf("expected 'system.devel', found: %s", v)
 	}
 	if v := value.Components["devel"].Value; v != "programming.devel" {
