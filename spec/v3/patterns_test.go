@@ -17,8 +17,8 @@
 package v3
 
 import (
-	"dev.getsol.us/source/libypkg/spec/shared/array"
-	"dev.getsol.us/source/libypkg/spec/shared/constant"
+	"dev.getsol.us/source/libypkg.git/spec/shared/array"
+	"dev.getsol.us/source/libypkg.git/spec/shared/constant"
 	"gopkg.in/yaml.v3"
 	"strings"
 	"testing"

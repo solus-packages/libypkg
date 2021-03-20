@@ -17,9 +17,9 @@
 package spec
 
 import (
-	"dev.getsol.us/source/libypkg/spec/internal"
-	"dev.getsol.us/source/libypkg/spec/v2"
-	"dev.getsol.us/source/libypkg/spec/v3"
+	"dev.getsol.us/source/libypkg.git/spec/internal"
+	"dev.getsol.us/source/libypkg.git/spec/v2"
+	"dev.getsol.us/source/libypkg.git/spec/v3"
 	"errors"
 	"gopkg.in/yaml.v3"
 	"os"

@@ -17,7 +17,7 @@
 package internal
 
 import (
-	"dev.getsol.us/source/libypkg/spec/shared"
+	"dev.getsol.us/source/libypkg.git/spec/shared"
 )
 
 // BuildFlags are special options that configure the build process

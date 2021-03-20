@@ -17,7 +17,7 @@
 package v3
 
 import (
-	"dev.getsol.us/source/libypkg/spec/internal"
+	"dev.getsol.us/source/libypkg.git/spec/internal"
 )
 
 // BuildStages represent the scripted commands to execute for each stage of the build process

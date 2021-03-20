@@ -1,4 +1,4 @@
-module dev.getsol.us/source/libypkg
+module dev.getsol.us/source/libypkg.git
 
 go 1.15
 
