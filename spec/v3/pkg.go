@@ -34,11 +34,11 @@ type PackageYML struct {
 	Homepage     string          `yaml:"homepage,omitempty"`
 	License      shared.Licenses `yaml:"license"`
 	Component    string          `yaml:"component"`
-	Components   array.Map       `yaml:"components"`
+	Components   array.Map       `yaml:"components,omitempty"`
 	Summary      string          `yaml:"summary"`
-	Summaries    array.Map       `yaml:"summaries"`
+	Summaries    array.Map       `yaml:"summaries,omitempty"`
 	Description  string          `yaml:"description"`
-	Descriptions array.Map       `yaml:"descriptions"`
+	Descriptions array.Map       `yaml:"descriptions,omitempty"`
 	Dependencies PackageDeps     `yaml:"deps,omitempty"`
 	Flags        BuildFlags      `yaml:"flags,omitempty"`
 	Environment  string          `yaml:"environment,omitempty"`
