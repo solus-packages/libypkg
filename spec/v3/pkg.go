@@ -33,11 +33,11 @@ type PackageYML struct {
 	Source       []shared.Source `yaml:"source"`
 	Homepage     string          `yaml:"homepage,omitempty"`
 	License      shared.Licenses `yaml:"license"`
-	Component    string          `yaml:"component"`
+	Component    string          `yaml:"component,omitempty"`
 	Components   array.Map       `yaml:"components,omitempty"`
-	Summary      string          `yaml:"summary"`
+	Summary      string          `yaml:"summary,omitempty"`
 	Summaries    array.Map       `yaml:"summaries,omitempty"`
-	Description  string          `yaml:"description"`
+	Description  string          `yaml:"description,omitempty"`
 	Descriptions array.Map       `yaml:"descriptions,omitempty"`
 	Dependencies PackageDeps     `yaml:"deps,omitempty"`
 	Flags        BuildFlags      `yaml:"flags,omitempty"`
@@ -89,7 +89,7 @@ func (p *PackageYML) Convert() (pkg *internal.PackageYML, err error) {
 
 // Modify converts an internal.PackageYML to a v2.PackageYML
 func (p *PackageYML) Modify(pkg internal.PackageYML) error {
-	p.YPKG = pkg.YPKG
+	p.YPKG = 3
 	p.Name = pkg.Name
 	p.Version = pkg.Version
 	p.Release = pkg.Release
